@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Github BBS</title>
+</head>
+<body>
+  <ul id="issues"></ul>
+  <script type="text/javascript" charset="utf-8">
+
+    document.onkeydown = checkKey;
+    function checkKey(e) {
+      e = e || window.event;
+      console.log(e.keyCode);
+    }
+
+    function reqListener () {
+      var issues = JSON.parse(this.responseText);
+      issues.forEach(function(issue){
+        var issue_li = document.createElement('li')
+        issue_li.textContent= issue['title'];
+        console.log(issue['title'])
+        document.getElementById('issues').appendChild(issue_li)
+
+      })
+    };
+
+    var oReq = new XMLHttpRequest();
+    oReq.onload = reqListener;
+    oReq.open("get", "https://api.github.com/repos/shinglyu/moztrap-new-ui/issues", true);
+    oReq.send();
+  </script>
+</body>
+</html>
