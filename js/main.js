@@ -1,8 +1,27 @@
 var h = React.createElement;
+
+var IssueItem = React.createClass({
+  handleClick: function() {
+    window.location = this.props.issueinfo.html_url
+  },
+  render: function() {
+    var info = this.props.issueinfo;
+    var title = info.title;
+    var issuenum = info.number;
+    console.log(issuenum);
+    return (
+        h('div', {className:"issueitem", onClick: this.handleClick},
+          h('li', null, issuenum + ' ' + title)
+        )
+    )
+  },
+})
+
+
 var IssueList =  React.createClass({
-  render: function(){
-    var lis = this.props.data.map(function(text, idx){
-      return h('li', {key:idx}, text)
+  render: function() {
+    var lis = this.props.issues.map(function(issue, idx) {
+      return h(IssueItem, {key: idx, issueinfo: issue})
     })
     return (
       h('ul', null, lis)
@@ -11,11 +30,33 @@ var IssueList =  React.createClass({
 })
 
 var IssuePage =  React.createClass({
+  getInitialState: function() {
+    return {issues: [{id: 0, title:"Loading..."}]}
+  },
+
+  componentDidMount: function() {
+    var url = "https://api.github.com/repos/";
+    var username = "servo";
+    var repo = "servo";
+
+
+    fetch(url + username + '/' + repo + '/issues')
+      .then(function(result) {
+        return result.json();
+      })
+      .then(function(issuejson) {
+        console.log(issuejson);
+        for(var id in issuejson) {
+          var org = issuejson[id];
+          this.setState({issues: issuejson})
+        }
+      }.bind(this))
+  },
   render: function(){
     return (
       h('div', null,
         h('h1', null, 'Issue List'),
-        h(IssueList, {data:['issue 1','issue 2','issue 3']})
+        h(IssueList, {issues: this.state.issues})
        )
     )
   }
@@ -26,17 +67,3 @@ ReactDOM.render(
   document.getElementById('issue')
 )
 
-//function reqListener () {
-//  var issues = JSON.parse(this.responseText);
-//  issues.forEach(function(issue){
-//    var issue_li = document.createElement('li')
-//    issue_li.textContent= issue['title'];
-//    console.log(issue['title'])
-//    document.getElementById('issues').appendChild(issue_li)
-//  })
-//};
-//
-//var oReq = new XMLHttpRequest();
-//oReq.onload = reqListener;
-//oReq.open("get", "https://api.github.com/repos/shinglyu/moztrap-new-ui/issues", true);
-//oReq.send();
