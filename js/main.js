@@ -3,6 +3,8 @@ var h = React.createElement;
 var IssueItem = React.createClass({
   render: function() {
     var info = this.props.issueinfo;
+    var mark = " "
+    if (this.props.id == this.props.curId) { mark="O" }
     var issuenum = info.number;
     var commentnum = info.comments;
     var datetime = info.created_at.split("T")[0].split("-");
@@ -12,6 +14,7 @@ var IssueItem = React.createClass({
     return (
       h('tbody', null,
         h('tr', {className:"issueitem"},
+          h('th', null, mark),
           h('th', {className:"right"}, issuenum),
           h('th', {className:"right"}, commentnum),
           h('th', {className:"right"}, date),
@@ -26,8 +29,9 @@ var IssueItem = React.createClass({
 
 var IssueList =  React.createClass({
   render: function() {
+    var curId = this.props.curId;
     var lis = this.props.issues.map(function(issue, idx) {
-      return h(IssueItem, {key: idx, issueinfo: issue})
+      return h(IssueItem, {key: idx, id: idx, curId: curId, issueinfo: issue})
     })
     return (
       h('table', null, lis)
@@ -52,7 +56,6 @@ var IssuePage =  React.createClass({
         return result.json();
       })
       .then(function(issuejson) {
-        console.log(issuejson);
         for(var id in issuejson) {
           var org = issuejson[id];
           this.setState({issues: issuejson})
@@ -60,10 +63,11 @@ var IssuePage =  React.createClass({
       }.bind(this))
   },
   render: function(){
+    var curId=0;
     return (
       h('div', null,
         h('h1', null, 'Issue List'),
-        h(IssueList, {issues: this.state.issues})
+        h(IssueList, {curId:curId, issues: this.state.issues})
        )
     )
   }
