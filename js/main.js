@@ -40,16 +40,37 @@ var IssueList =  React.createClass({
 })
 
 var IssuePage =  React.createClass({
+  onKeyDown: function(e) {
+    var c = e.keyCode;
+    switch (c) {
+      case 38: //up arrow
+        e.preventDefault();
+        if (this.state.curId > 0) {
+          this.setState({curId: this.state.curId-1});
+        }
+        break;
+      case 40: //down arrow
+        e.preventDefault();
+        if (this.state.curId < this.state.issues.length-1) {
+          this.setState({curId: this.state.curId+1});
+        }
+        break;
+      case 39: //right arrow
+        e.preventDefault();
+        window.location = this.state.issues[this.state.curId].html_url;
+        break;
+    }
+  },
+
   getInitialState: function() {
     var loadingmsg = {number: "", title:"Loading...", created_at:"", user:{}};
-    return {issues: [loadingmsg]}
+    return {issues: [loadingmsg], curId: 0}
   },
 
   componentDidMount: function() {
     var url = "https://api.github.com/repos/";
     var username = "servo";
     var repo = "servo";
-
 
     fetch(url + username + '/' + repo + '/issues')
       .then(function(result) {
@@ -60,14 +81,15 @@ var IssuePage =  React.createClass({
           var org = issuejson[id];
           this.setState({issues: issuejson})
         }
-      }.bind(this))
+      }.bind(this));
+
+    document.onkeydown = this.onKeyDown;
   },
   render: function(){
-    var curId=0;
     return (
       h('div', null,
         h('h1', null, 'Issue List'),
-        h(IssueList, {curId:curId, issues: this.state.issues})
+        h(IssueList, {issues: this.state.issues, curId: this.state.curId})
        )
     )
   }
