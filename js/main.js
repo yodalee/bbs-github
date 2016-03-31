@@ -63,14 +63,16 @@ var IssuePage =  React.createClass({
   },
 
   getInitialState: function() {
-    var loadingmsg = {number: "", title:"Loading...", created_at:"", user:{}};
+    var loadingmsg = {number: "", title:"Loading...", created_at:"--T", user:{}};
     return {issues: [loadingmsg], curId: 0}
   },
 
   componentDidMount: function() {
     var url = "https://api.github.com/repos/";
-    var username = "servo";
-    var repo = "servo";
+    var username = null;
+    var repo = null;
+    username = prompt("What's your github username?");
+    repo = prompt("The repository name?");
 
     fetch(url + username + '/' + repo + '/issues')
       .then(function(result) {
